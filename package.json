@@ -1,0 +1,32 @@
+{
+  "name": "visualizer",
+  "version": "0.1.0",
+  "main": "server.js",
+  "scripts": {
+    "build": "npx webpack",
+    "start": "npx webpack --watch",
+    "serve": "electron ."
+  },
+  "devDependencies": {
+    "@babel/core": "^7.10.5",
+    "@babel/preset-env": "^7.10.4",
+    "@babel/preset-react": "^7.10.4",
+    "babel-loader": "^8.1.0",
+    "css-loader": "^4.1.1",
+    "electron": "^11.0.4",
+    "style-loader": "^1.2.1",
+    "webpack": "^4.44.0",
+    "webpack-cli": "^3.3.12"
+  },
+  "dependencies": {
+    "electron-reload": "^1.5.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  },
+  "babel": {
+    "presets": [
+      "@babel/preset-env",
+      "@babel/preset-react"
+    ]
+  }
+}
