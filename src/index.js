@@ -16,7 +16,7 @@ var fVisualizer = {
   fadeDuration: 1000,
   curColorI: 0,
   isDifferent(a, b) {
-    if ( Math.abs(a - b) > 100 ) {
+    if ( Math.abs(a - b) > 50 ) {
       return true;
     } else {
       return false;
@@ -88,6 +88,7 @@ var fVisualizer = {
   },
   capture() {
     var that = this;
+    // capture video
     that.captureCtx.drawImage(that.camera, 0, 0, that.captureWidth, that.captureHeight)
     let imgData = that.captureCtx.getImageData(0, 0, that.captureWidth, that.captureHeight).data
     that.processImgData(imgData)
