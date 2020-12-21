@@ -1,22 +1,3 @@
-:root {
-  --c-white: #ffffff;
-  --c-pink: #e942f5;
-  --c-darkPurple: #532585;
-}
-@keyframes pixel_life {
-  0% {
-    opacity: 0.8;
-    z-index: 500;
-  }
-  10% {
-    opacity: 1;
-    z-index: 1000;
-  }
-  100% {
-    opacity: 0;
-    z-index: 0;
-  }
-}
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -33,22 +14,4 @@ body {
 }
 .capture_canvas {
   display: none;
-}
-.visual_display {
-  background-color: black;
-  height: 600px;
-  position: relative;
-  width: 800px;
-}
-.pixel {
-  animation-duration: 1s;
-  animation-fill-mode: forwards;
-  animation-iteration-count: 1;
-  animation-name: pixel_life;
-  animation-timing-function: linear;
-  position: absolute;
-}
-.display_canvas {
-  height: 600px;
-  width: 800px;
 }
