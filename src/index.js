@@ -3,7 +3,7 @@ import easing from './easing'
 var fVisualizer = {
   camera: document.getElementById('js-camera'),
   captureCanvas: document.getElementById('js-capture_canvas'),
-  htmlDisplay: document.getElementById('js-html_display'),
+  displayCanvas: document.getElementById('js-display_canvas'),
   displayCtx: false,
   captureCtx: false,
   captureWidth: 40,
@@ -21,14 +21,6 @@ var fVisualizer = {
     } else {
       return false;
     }
-  },
-  plotChange(row, col, time) {
-    let that = this;
-    that.pixels.push({
-      row: row,
-      col: col,
-      birth: time,
-    })
   },
   processImgData(imgData) {
     let that = this;
@@ -53,7 +45,12 @@ var fVisualizer = {
             that.isDifferent(b, prevB)
           ) {
             // that one changed!!
-            that.plotChange(row, col, time)
+            let key = row + '_' + col;
+            that.pixels[key] = {
+              row: row,
+              col: col,
+              birth: time
+            }
           }
         }
       }
@@ -62,24 +59,23 @@ var fVisualizer = {
   },
   render() {
     let that = this
-    let pixelsLength = that.pixels.length
     let now = Date.now()
     let colorString = 'hsl(' + that.curColorI + 'deg, 100%, 50%)'
-    for ( let i = 0; i < pixelsLength; i++ ) {
-      let curPix = that.pixels[i]
-      let pixel = document.createElement('div')
-      pixel.className = 'pixel'
-      pixel.style.width = that.scale + 'px'
-      pixel.style.height = that.scale + 'px'
-      pixel.style.left = that.displayWidth - that.scale - (curPix.col * that.scale) + 'px'
-      pixel.style.top = (curPix.row * that.scale) + 'px'
-      pixel.style.backgroundColor = colorString
-      that.htmlDisplay.appendChild(pixel)
-      setTimeout(() => {
-        pixel.remove()
-      }, 1000)
+    that.displayCtx.clearRect(0, 0, that.displayWidth, that.displayHeight)
+    for (const [key, value] of Object.entries(that.pixels)) {
+      if ( now - value.birth >= that.fadeDuration ) {
+        that.pixels[key] = []
+      } else if ( 'birth' in value ) {
+        // plot pixel
+        if ( 'color' in value ) {
+          that.displayCtx.fillStyle = value.color
+        } else {
+          that.displayCtx.fillStyle = colorString
+          that.pixels[key].color = colorString
+        }
+        that.displayCtx.fillRect(value.col * that.scale, value.row * that.scale, that.scale, that.scale)
+      }
     }
-    that.pixels = []
     if ( that.curColorI >= 360 ) {
       that.curColorI = 0
     } else {
@@ -101,6 +97,7 @@ var fVisualizer = {
   init() {
     let that = this
     that.captureCtx = that.captureCanvas.getContext('2d')
+    that.displayCtx = that.displayCanvas.getContext('2d')
     that.displayWidth = that.captureWidth * that.scale
     that.displayHeight = that.captureHeight * that.scale
     navigator.mediaDevices.getUserMedia({video: true})

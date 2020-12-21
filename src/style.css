@@ -48,3 +48,7 @@ body {
   animation-timing-function: linear;
   position: absolute;
 }
+.display_canvas {
+  height: 600px;
+  width: 800px;
+}
