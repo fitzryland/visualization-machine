@@ -62,8 +62,6 @@ var fVisualizer = {
     let now = Date.now()
     that.displayCtx.clearRect(0, 0, that.displayWidth, that.displayHeight)
     for (const [key, value] of Object.entries(that.pixels)) {
-      // console.log('key', key)
-      // t: current time, b: begInnIng value, c: change In value, d: duration
       if ( now - value.birth >= that.fadeDuration ) {
         that.pixels[key] = []
       } else if ( 'birth' in value ) {
@@ -72,9 +70,6 @@ var fVisualizer = {
         }
         let alpha = easing.easeOutQuad(now - value.birth, 1, -1, that.fadeDuration)
         let colorString = 'hsla(' + value.color + 'deg, 100%, 50%, ' + alpha + ')'
-        if ( key === '9_29' ) {
-          colorString
-        }
         that.displayCtx.fillStyle = colorString
         that.displayCtx.fillRect(value.col * that.scale, value.row * that.scale, that.scale, that.scale)
       }
