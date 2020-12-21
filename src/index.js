@@ -48,7 +48,7 @@ var fVisualizer = {
             let key = row + '_' + col;
             that.pixels[key] = {
               row: row,
-              col: col,
+              col: that.captureWidth - 1 - col,
               birth: time
             }
           }
@@ -60,19 +60,22 @@ var fVisualizer = {
   render() {
     let that = this
     let now = Date.now()
-    let colorString = 'hsl(' + that.curColorI + 'deg, 100%, 50%)'
     that.displayCtx.clearRect(0, 0, that.displayWidth, that.displayHeight)
     for (const [key, value] of Object.entries(that.pixels)) {
+      // console.log('key', key)
+      // t: current time, b: begInnIng value, c: change In value, d: duration
       if ( now - value.birth >= that.fadeDuration ) {
         that.pixels[key] = []
       } else if ( 'birth' in value ) {
-        // plot pixel
-        if ( 'color' in value ) {
-          that.displayCtx.fillStyle = value.color
-        } else {
-          that.displayCtx.fillStyle = colorString
-          that.pixels[key].color = colorString
+        if ( !('color' in value) ) {
+          that.pixels[key].color = that.curColorI
         }
+        let alpha = easing.easeOutQuad(now - value.birth, 1, -1, that.fadeDuration)
+        let colorString = 'hsla(' + value.color + 'deg, 100%, 50%, ' + alpha + ')'
+        if ( key === '9_29' ) {
+          colorString
+        }
+        that.displayCtx.fillStyle = colorString
         that.displayCtx.fillRect(value.col * that.scale, value.row * that.scale, that.scale, that.scale)
       }
     }
