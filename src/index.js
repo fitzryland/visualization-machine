@@ -168,3 +168,9 @@ var fVisualizer = {
   }
 }
 fVisualizer.init();
+
+// @TODO
+// fully separate audio and video rendering
+// video should always be on top
+// but
+// the audio layer should be more complex
