@@ -6,6 +6,12 @@ var fVisualizer = {
   displayCanvas: document.getElementById('js-display_canvas'),
   displayCtx: false,
   captureCtx: false,
+  audioAnalyser: false,
+  audioFrequencyArray: false,
+  inits: {
+    audio: false,
+    video: false
+  },
   captureWidth: 40,
   captureHeight: 30,
   displayWidth: false,
@@ -20,6 +26,18 @@ var fVisualizer = {
       return true;
     } else {
       return false;
+    }
+  },
+  mapRange( val, inMin, inMax, outMin, outMax ) {
+    return ( val - inMin ) * ( outMax - outMin ) / ( inMax - inMin ) + outMin
+  },
+  plotPixel(row, col, time) {
+    var that = this
+    let key = row + '_' + col
+    that.pixels[key] = {
+      row: row,
+      col: that.captureWidth - 1 - col,
+      birth: time
     }
   },
   processImgData(imgData) {
@@ -45,17 +63,24 @@ var fVisualizer = {
             that.isDifferent(b, prevB)
           ) {
             // that one changed!!
-            let key = row + '_' + col;
-            that.pixels[key] = {
-              row: row,
-              col: that.captureWidth - 1 - col,
-              birth: time
-            }
+            that.plotPixel(row, col, time)
           }
         }
       }
     }
     that.prevImg = imgData
+  },
+  processAudioData() {
+    var that = this
+    let time = Date.now()
+    for (var i = 0 ; i < 32; i++) {
+      // that.mapRange( val, inMin, inMax, outMin, outMax )
+      var barHeight = that.mapRange( that.audioFrequencyArray[i], 0, 255, 0, that.displayHeight )
+      // console.log('barHeight', barHeight)
+      for ( var ii = 0; ii < barHeight; ii++ ) {
+        that.plotPixel(ii, i, time)
+      }
+    }
   },
   render() {
     let that = this
@@ -80,24 +105,36 @@ var fVisualizer = {
       that.curColorI = that.curColorI + 10
     }
   },
-  capture() {
+  captureVideo() {
     var that = this;
     // capture video
     that.captureCtx.drawImage(that.camera, 0, 0, that.captureWidth, that.captureHeight)
     let imgData = that.captureCtx.getImageData(0, 0, that.captureWidth, that.captureHeight).data
     that.processImgData(imgData)
   },
-  loop() {
-    fVisualizer.capture()
-    fVisualizer.render()
-    window.requestAnimationFrame(fVisualizer.loop)
+  captureAudio() {
+    console.log('captureAudio')
+    var that = this;
+    that.audioAnalyser.getByteFrequencyData(that.audioFrequencyArray);
+    that.processAudioData()
   },
-  init() {
+  loop() {
+    if ( fVisualizer.inits.video && fVisualizer.inits.audio ) {
+      fVisualizer.captureVideo()
+      fVisualizer.captureAudio()
+      fVisualizer.render()
+      window.requestAnimationFrame(fVisualizer.loop)
+    }
+  },
+  initDisplay() {
     let that = this
-    that.captureCtx = that.captureCanvas.getContext('2d')
     that.displayCtx = that.displayCanvas.getContext('2d')
     that.displayWidth = that.captureWidth * that.scale
     that.displayHeight = that.captureHeight * that.scale
+  },
+  initVideo() {
+    let that = this
+    that.captureCtx = that.captureCanvas.getContext('2d')
     navigator.mediaDevices.getUserMedia({video: true})
       .then(function(stream) {
         that.camera.srcObject = stream
@@ -108,8 +145,30 @@ var fVisualizer = {
         alert('could not connect stream')
       })
     that.camera.addEventListener('play', function () {
+      that.inits.video = true
       that.loop()
     }, 0);
+  },
+  initAudio(stream) {
+    window.persistAudioStream = stream
+    var audioContent = new AudioContext();
+    console.log('audioContent', audioContent)
+    var audioStream = audioContent.createMediaStreamSource( stream );
+    fVisualizer.audioAnalyser = audioContent.createAnalyser();
+    audioStream.connect(fVisualizer.audioAnalyser);
+    fVisualizer.audioAnalyser.fftSize = 64
+    fVisualizer.audioFrequencyArray = new Uint8Array(fVisualizer.audioAnalyser.frequencyBinCount);
+    fVisualizer.inits.audio = true
+    fVisualizer.loop()
+  },
+  audioFailed() {
+    console.log('audio connection failed')
+  },
+  init() {
+    let that = this
+    fVisualizer.initDisplay()
+    that.initVideo();
+    navigator.getUserMedia({audio:true}, that.initAudio, that.audioFailed);
   }
 }
 fVisualizer.init();
