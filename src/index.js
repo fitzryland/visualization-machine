@@ -74,9 +74,7 @@ var fVisualizer = {
     var that = this
     let time = Date.now()
     for (var i = 0 ; i < 32; i++) {
-      // that.mapRange( val, inMin, inMax, outMin, outMax )
-      var barHeight = that.mapRange( that.audioFrequencyArray[i], 0, 255, 0, that.displayHeight )
-      // console.log('barHeight', barHeight)
+      var barHeight = that.mapRange( that.audioFrequencyArray[i], 0, 255, 0, that.captureHeight )
       for ( var ii = 0; ii < barHeight; ii++ ) {
         that.plotPixel(ii, i, time)
       }
@@ -113,15 +111,14 @@ var fVisualizer = {
     that.processImgData(imgData)
   },
   captureAudio() {
-    console.log('captureAudio')
     var that = this;
     that.audioAnalyser.getByteFrequencyData(that.audioFrequencyArray);
     that.processAudioData()
   },
   loop() {
     if ( fVisualizer.inits.video && fVisualizer.inits.audio ) {
-      fVisualizer.captureVideo()
       fVisualizer.captureAudio()
+      fVisualizer.captureVideo()
       fVisualizer.render()
       window.requestAnimationFrame(fVisualizer.loop)
     }
@@ -152,7 +149,6 @@ var fVisualizer = {
   initAudio(stream) {
     window.persistAudioStream = stream
     var audioContent = new AudioContext();
-    console.log('audioContent', audioContent)
     var audioStream = audioContent.createMediaStreamSource( stream );
     fVisualizer.audioAnalyser = audioContent.createAnalyser();
     audioStream.connect(fVisualizer.audioAnalyser);
