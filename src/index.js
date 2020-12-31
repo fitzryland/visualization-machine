@@ -19,6 +19,7 @@ var fVisualizer = {
   scale: 20,
   prevImg: false,
   pixels: [],
+  pixelsAudio: [],
   fadeDuration: 1000,
   curColorI: 0,
   isDifferent(a, b) {
@@ -30,6 +31,10 @@ var fVisualizer = {
   },
   mapRange( val, inMin, inMax, outMin, outMax ) {
     return ( val - inMin ) * ( outMax - outMin ) / ( inMax - inMin ) + outMin
+  },
+  randomInt(min, max) {
+    // min & max inclusive
+    return Math.floor(Math.random() * ( max - min + 1 ) + min)
   },
   plotPixel(row, col, time) {
     var that = this
@@ -74,16 +79,25 @@ var fVisualizer = {
     var that = this
     let time = Date.now()
     for (var i = 0 ; i < 32; i++) {
-      var barHeight = that.mapRange( that.audioFrequencyArray[i], 0, 255, 0, that.captureHeight )
-      for ( var ii = 0; ii < barHeight; ii++ ) {
-        that.plotPixel(ii, i, time)
+      var row = that.randomInt(0, that.captureHeight)
+      var col = that.randomInt(0, that.captureWidth)
+      var key = row + '_' + col
+      var size = that.audioFrequencyArray[i]
+      if ( size > 100 ) {
+        // plot those to an audio render array
+        that.pixelsAudio[key] = {
+          row: row,
+          col: col,
+          size: that.mapRange(that.audioFrequencyArray[i], 0, 255, 30, 70), // luminosity
+          freq: that.mapRange( i, 0, 31, 0, 255 ), // hue
+          birth: time
+        }
       }
     }
   },
-  render() {
+  renderVideo() {
     let that = this
     let now = Date.now()
-    that.displayCtx.clearRect(0, 0, that.displayWidth, that.displayHeight)
     for (const [key, value] of Object.entries(that.pixels)) {
       if ( now - value.birth >= that.fadeDuration ) {
         that.pixels[key] = []
@@ -102,6 +116,26 @@ var fVisualizer = {
     } else {
       that.curColorI = that.curColorI + 10
     }
+  },
+  renderAudio() {
+    let that = this
+    let now = Date.now()
+    for (const [key, value] of Object.entries(that.pixelsAudio)) {
+      if ( now - value.birth >= that.fadeDuration ) {
+        that.pixelsAudio[key] = []
+      } else if ( 'birth' in value ) {
+        let a = easing.easeOutQuad(now - value.birth, 1, -1, that.fadeDuration)
+        let colorString = 'hsla(' + value.freq + 'deg, 100%, ' + value.size + '%, ' + a + ')'
+        that.displayCtx.fillStyle = colorString
+        that.displayCtx.fillRect(value.col * that.scale, value.row * that.scale, that.scale, that.scale)
+      }
+    }
+  },
+  render() {
+    var that = this
+    that.displayCtx.clearRect(0, 0, that.displayWidth, that.displayHeight)
+    that.renderAudio()
+    that.renderVideo()
   },
   captureVideo() {
     var that = this;
@@ -162,12 +196,13 @@ var fVisualizer = {
   },
   init() {
     let that = this
-    fVisualizer.initDisplay()
-    that.initVideo();
-    navigator.getUserMedia({audio:true}, that.initAudio, that.audioFailed);
+    that.initDisplay()
+    that.initVideo()
+    //
+    navigator.getUserMedia({audio:true}, that.initAudio, that.audioFailed)
   }
 }
-fVisualizer.init();
+fVisualizer.init()
 
 // @TODO
 // fully separate audio and video rendering
