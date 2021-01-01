@@ -8,6 +8,7 @@ var fVisualizer = {
   captureCtx: false,
   audioAnalyser: false,
   audioFrequencyArray: false,
+  fftSize: 256,
   inits: {
     audio: false,
     video: false
@@ -78,21 +79,32 @@ var fVisualizer = {
   processAudioData() {
     var that = this
     let time = Date.now()
-    for (var i = 0 ; i < 32; i++) {
-      var row = that.randomInt(0, that.captureHeight)
-      var col = that.randomInt(0, that.captureWidth)
-      var key = row + '_' + col
+    for (var i = 0 ; i < (that.fftSize/2); i++) {
+      // var row = that.randomInt(0, that.captureHeight)
+      var col = Math.round(that.mapRange( i, 0, 31, 0, that.captureWidth )) // hue
       var size = that.audioFrequencyArray[i]
-      if ( size > 100 ) {
-        // plot those to an audio render array
+      for ( var ii = 0; ii < size; ii++ ) {
+        // ii = volumn
+        // col = frequency
+        var key = ii + '_' + col
         that.pixelsAudio[key] = {
-          row: row,
+          row: that.mapRange(ii, 0, 255, 0, that.captureHeight),
           col: col,
-          size: that.mapRange(that.audioFrequencyArray[i], 0, 255, 30, 70), // luminosity
-          freq: that.mapRange( i, 0, 31, 0, 255 ), // hue
+          size: that.mapRange(ii, 0, 255, 30, 70), // luminosity
+          freq: 330 - that.mapRange( i, 0, 31, 0, 360 ), // hue
           birth: time
         }
       }
+      // if ( size > 100 ) {
+        // plot those to an audio render array
+        // that.pixelsAudio[key] = {
+        //   row: row,
+        //   col: col,
+        //   size: that.mapRange(that.audioFrequencyArray[i], 0, 255, 30, 70), // luminosity
+        //   freq: 360 - that.mapRange( i, 0, 31, 0, 360 ), // hue
+        //   birth: time
+        // }
+      // }
     }
   },
   renderVideo() {
@@ -186,7 +198,7 @@ var fVisualizer = {
     var audioStream = audioContent.createMediaStreamSource( stream );
     fVisualizer.audioAnalyser = audioContent.createAnalyser();
     audioStream.connect(fVisualizer.audioAnalyser);
-    fVisualizer.audioAnalyser.fftSize = 64
+    fVisualizer.audioAnalyser.fftSize = fVisualizer.fftSize
     fVisualizer.audioFrequencyArray = new Uint8Array(fVisualizer.audioAnalyser.frequencyBinCount);
     fVisualizer.inits.audio = true
     fVisualizer.loop()
@@ -203,9 +215,3 @@ var fVisualizer = {
   }
 }
 fVisualizer.init()
-
-// @TODO
-// fully separate audio and video rendering
-// video should always be on top
-// but
-// the audio layer should be more complex
