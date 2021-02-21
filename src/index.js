@@ -4,6 +4,11 @@ var fVisualizer = {
   camera: document.getElementById('js-camera'),
   captureCanvas: document.getElementById('js-capture_canvas'),
   displayCanvas: document.getElementById('js-display_canvas'),
+  options: {
+    motion: true,
+    audio: true,
+    image: true
+  },
   displayCtx: false,
   captureCtx: false,
   audioAnalyser: false,
@@ -21,6 +26,7 @@ var fVisualizer = {
   prevImg: false,
   pixels: [],
   pixelsAudio: [],
+  pixelsImage: [],
   fadeDuration: 1000,
   curColorI: 0,
   isDifferent(a, b) {
@@ -46,6 +52,22 @@ var fVisualizer = {
     var abs = Math.abs( dist - r )
     // return ( r >= dist ? true : false )
     return ( abs <= 1 ? true : false )
+  },
+  plotImage(imgData) {
+    var that = this
+    for ( var row = 0; row < that.captureHeight; row++ ) {
+      for ( var col = 0; col < that.captureWidth; col++ ) {
+        let key = row + '_' + col
+        let position = (col + row * that.captureWidth) * 4
+        that.pixelsImage[key] = {
+          row: row,
+          col: that.captureWidth - 1 - col,
+          r: imgData[position],
+          g: imgData[position + 1],
+          b: imgData[position + 2],
+        }
+      }
+    }
   },
   plotPixel(row, col, time) {
     var that = this
@@ -153,9 +175,17 @@ var fVisualizer = {
       }
     }
   },
+  renderImage() {
+    var that = this;
+    for (const [key, value] of Object.entries(that.pixelsImage)) {
+      that.displayCtx.fillStyle = `rgb(${value.r}, ${value.g}, ${value.b})`
+      that.displayCtx.fillRect(value.col * that.scale, value.row * that.scale, that.scale, that.scale)
+    }
+  },
   render() {
     var that = this
     that.displayCtx.clearRect(0, 0, that.displayWidth, that.displayHeight)
+    that.renderImage()
     that.renderAudio()
     that.renderVideo()
   },
@@ -164,6 +194,7 @@ var fVisualizer = {
     // capture video
     that.captureCtx.drawImage(that.camera, 0, 0, that.captureWidth, that.captureHeight)
     let imgData = that.captureCtx.getImageData(0, 0, that.captureWidth, that.captureHeight).data
+    that.plotImage(imgData)
     that.processImgData(imgData)
   },
   captureAudio() {
@@ -172,9 +203,17 @@ var fVisualizer = {
     that.processAudioData()
   },
   loop() {
-    if ( fVisualizer.inits.video && fVisualizer.inits.audio ) {
-      fVisualizer.captureAudio()
-      fVisualizer.captureVideo()
+    if (
+        ( fVisualizer.inits.video || !fVisualizer.options.motion )
+        &&
+        ( fVisualizer.inits.audio || !fVisualizer.options.audio )
+      ) {
+      if ( fVisualizer.options.audio ) {
+        fVisualizer.captureAudio()
+      }
+      if ( fVisualizer.options.motion ) {
+        fVisualizer.captureVideo()
+      }
       fVisualizer.render()
       window.requestAnimationFrame(fVisualizer.loop)
     }
@@ -223,9 +262,12 @@ var fVisualizer = {
   init() {
     let that = this
     that.initDisplay()
-    that.initVideo()
-    //
-    navigator.getUserMedia({audio:true}, that.initAudio, that.audioFailed)
+    if ( that.options.motion ) {
+      that.initVideo()
+    }
+    if ( that.options.audio ) {
+      navigator.getUserMedia({audio:true}, that.initAudio, that.audioFailed)
+    }
   }
 }
 fVisualizer.init()
