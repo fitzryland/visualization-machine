@@ -13,8 +13,8 @@ var fVisualizer = {
     audio: false,
     video: false
   },
-  captureWidth: 40,
-  captureHeight: 30,
+  captureWidth: 17,
+  captureHeight: 23,
   displayWidth: false,
   displayHeight: false,
   scale: 20,
@@ -184,6 +184,10 @@ var fVisualizer = {
     that.displayCtx = that.displayCanvas.getContext('2d')
     that.displayWidth = that.captureWidth * that.scale
     that.displayHeight = that.captureHeight * that.scale
+    // you have to set explicit dimensions on the
+    // display canvas in order for it to render correctly
+    that.displayCanvas.width = that.displayWidth
+    that.displayCanvas.height = that.displayHeight
   },
   initVideo() {
     let that = this
