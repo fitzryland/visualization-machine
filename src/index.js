@@ -37,6 +37,16 @@ var fVisualizer = {
     // min & max inclusive
     return Math.floor(Math.random() * ( max - min + 1 ) + min)
   },
+  isInsideCircle(x1, y1, x2, y2, r) {
+    var xs = x2 - x1;
+    var ys = y2 - y1;
+    xs *= xs;
+    ys *= ys;
+    var dist = Math.sqrt( xs + ys )
+    var abs = Math.abs( dist - r )
+    // return ( r >= dist ? true : false )
+    return ( abs <= 1 ? true : false )
+  },
   plotPixel(row, col, time) {
     var that = this
     let key = row + '_' + col
@@ -80,31 +90,20 @@ var fVisualizer = {
     var that = this
     let time = Date.now()
     for (var i = 0 ; i < (that.fftSize/2); i++) {
-      // var row = that.randomInt(0, that.captureHeight)
-      var col = Math.round(that.mapRange( i, 0, 31, 0, that.captureWidth )) // hue
+      var row = that.randomInt(0, that.captureHeight)
+      var col = that.randomInt(0, that.captureWidth)
+      var key = row + '_' + col
+      // var col = Math.round(that.mapRange( i, 0, 31, 0, that.captureWidth )) // hue
       var size = that.audioFrequencyArray[i]
-      for ( var ii = 0; ii < size; ii++ ) {
-        // ii = volumn
-        // col = frequency
-        var key = ii + '_' + col
+      if ( size > 200 ) {
         that.pixelsAudio[key] = {
-          row: that.mapRange(ii, 0, 255, 0, that.captureHeight),
+          row: row,
           col: col,
-          size: that.mapRange(ii, 0, 255, 30, 70), // luminosity
-          freq: 330 - that.mapRange( i, 0, 31, 0, 360 ), // hue
+          size: that.audioFrequencyArray[i],
+          freq: i,
           birth: time
         }
       }
-      // if ( size > 100 ) {
-        // plot those to an audio render array
-        // that.pixelsAudio[key] = {
-        //   row: row,
-        //   col: col,
-        //   size: that.mapRange(that.audioFrequencyArray[i], 0, 255, 30, 70), // luminosity
-        //   freq: 360 - that.mapRange( i, 0, 31, 0, 360 ), // hue
-        //   birth: time
-        // }
-      // }
     }
   },
   renderVideo() {
@@ -136,10 +135,21 @@ var fVisualizer = {
       if ( now - value.birth >= that.fadeDuration ) {
         that.pixelsAudio[key] = []
       } else if ( 'birth' in value ) {
+        let h = that.mapRange( value.freq, 0, 31, 255, 360 )
+        let l = that.mapRange(value.size, 0, 255, 10, 50)
         let a = easing.easeOutQuad(now - value.birth, 1, -1, that.fadeDuration)
-        let colorString = 'hsla(' + value.freq + 'deg, 100%, ' + value.size + '%, ' + a + ')'
+        let r = easing.easeOutQuad(now - value.birth, 1, 5, that.fadeDuration/2)
+        let colorString = 'hsla(' + h + 'deg, 100%, ' + l + '%, ' + a + ')'
         that.displayCtx.fillStyle = colorString
-        that.displayCtx.fillRect(value.col * that.scale, value.row * that.scale, that.scale, that.scale)
+        // loop through rows and columns
+        // if the cell is inside the circle color it
+        for ( var row = 0; row < that.captureHeight; row++ ) {
+          for ( var col = 0; col < that.captureWidth; col++ ) {
+            if ( that.isInsideCircle( col, row, value.col, value.row, r ) ) {
+              that.displayCtx.fillRect(col * that.scale, row * that.scale, that.scale, that.scale)
+            }
+          }
+        }
       }
     }
   },
