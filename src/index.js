@@ -7,7 +7,7 @@ var fPixelArto = {
   options: {
     motion: true,
     audio: true,
-    image: true
+    image: false
   },
   displayCtx: false,
   captureCtx: false,
@@ -194,7 +194,9 @@ var fPixelArto = {
     // capture video
     that.captureCtx.drawImage(that.camera, 0, 0, that.captureWidth, that.captureHeight)
     let imgData = that.captureCtx.getImageData(0, 0, that.captureWidth, that.captureHeight).data
-    that.plotImage(imgData)
+    if ( fPixelArto.options.image ) {
+      that.plotImage(imgData)
+    }
     that.processImgData(imgData)
   },
   captureAudio() {
