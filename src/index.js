@@ -25,7 +25,7 @@ var fPixelArto = {
   // captureHeight: 37,
   displayWidth: false,
   displayHeight: false,
-  scale: 20,
+  scale: 1,
   prevImg: false,
   pixels: [],
   pixelsAudio: [],
