@@ -1,6 +1,6 @@
 import easing from './easing'
 
-var fVisualizer = {
+var fPixelArto = {
   camera: document.getElementById('js-camera'),
   captureCanvas: document.getElementById('js-capture_canvas'),
   displayCanvas: document.getElementById('js-display_canvas'),
@@ -204,18 +204,18 @@ var fVisualizer = {
   },
   loop() {
     if (
-        ( fVisualizer.inits.video || !fVisualizer.options.motion )
+        ( fPixelArto.inits.video || !fPixelArto.options.motion )
         &&
-        ( fVisualizer.inits.audio || !fVisualizer.options.audio )
+        ( fPixelArto.inits.audio || !fPixelArto.options.audio )
       ) {
-      if ( fVisualizer.options.audio ) {
-        fVisualizer.captureAudio()
+      if ( fPixelArto.options.audio ) {
+        fPixelArto.captureAudio()
       }
-      if ( fVisualizer.options.motion ) {
-        fVisualizer.captureVideo()
+      if ( fPixelArto.options.motion ) {
+        fPixelArto.captureVideo()
       }
-      fVisualizer.render()
-      window.requestAnimationFrame(fVisualizer.loop)
+      fPixelArto.render()
+      window.requestAnimationFrame(fPixelArto.loop)
     }
   },
   initDisplay() {
@@ -249,12 +249,12 @@ var fVisualizer = {
     window.persistAudioStream = stream
     var audioContent = new AudioContext();
     var audioStream = audioContent.createMediaStreamSource( stream );
-    fVisualizer.audioAnalyser = audioContent.createAnalyser();
-    audioStream.connect(fVisualizer.audioAnalyser);
-    fVisualizer.audioAnalyser.fftSize = fVisualizer.fftSize
-    fVisualizer.audioFrequencyArray = new Uint8Array(fVisualizer.audioAnalyser.frequencyBinCount);
-    fVisualizer.inits.audio = true
-    fVisualizer.loop()
+    fPixelArto.audioAnalyser = audioContent.createAnalyser();
+    audioStream.connect(fPixelArto.audioAnalyser);
+    fPixelArto.audioAnalyser.fftSize = fPixelArto.fftSize
+    fPixelArto.audioFrequencyArray = new Uint8Array(fPixelArto.audioAnalyser.frequencyBinCount);
+    fPixelArto.inits.audio = true
+    fPixelArto.loop()
   },
   audioFailed() {
     console.log('audio connection failed')
@@ -270,4 +270,4 @@ var fVisualizer = {
     }
   }
 }
-fVisualizer.init()
+fPixelArto.init()
