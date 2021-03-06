@@ -1,4 +1,5 @@
 import easing from './easing'
+import './style.scss'
 
 var fPixelArto = {
   camera: document.getElementById('js-camera'),
@@ -20,15 +21,24 @@ var fPixelArto = {
   },
   captureWidth: 17,
   captureHeight: 23,
+  // captureWidth: 50,
+  // captureHeight: 37,
   displayWidth: false,
   displayHeight: false,
-  scale: 20,
+  scale: 1,
   prevImg: false,
   pixels: [],
   pixelsAudio: [],
   pixelsImage: [],
   fadeDuration: 1000,
   curColorI: 0,
+  classes: [
+    'left-right',
+    'right-left',
+    'top-bottom',
+    'bottom-top'
+  ],
+  curClassI: 0,
   isDifferent(a, b) {
     if ( Math.abs(a - b) > 50 ) {
       return true;
@@ -261,6 +271,23 @@ var fPixelArto = {
   audioFailed() {
     console.log('audio connection failed')
   },
+  // initClassRotation() {
+  //   var that = this;
+  //   console.log('that.curClassI', that.curClassI)
+  //   that.classes.forEach((val) => {
+  //     that.displayCanvas.classList.remove(val)
+  //   })
+  //   that.displayCanvas.classList.add(that.classes[that.curClassI])
+  //   // that.curClassI = ( that.classes.length <= that.curClassI ? 0 : that.curClassI + 1 )
+  //   if ( that.curClassI < (that.classes.length - 1) ) {
+  //     that.curClassI++
+  //   } else {
+  //     that.curClassI = 0
+  //   }
+  //   setTimeout(() => {
+  //     that.initClassRotation();
+  //   }, 1000)
+  // },
   init() {
     let that = this
     that.initDisplay()
@@ -270,6 +297,7 @@ var fPixelArto = {
     if ( that.options.audio ) {
       navigator.getUserMedia({audio:true}, that.initAudio, that.audioFailed)
     }
+    // that.initClassRotation();
   }
 }
 fPixelArto.init()

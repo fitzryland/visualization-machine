@@ -1,4 +1,11 @@
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 module.exports = {
+  plugins: [
+    new MiniCssExtractPlugin({
+      filename: './style.css',
+      chunkFilename: '[id].css'
+    })
+  ],
   entry: './src/index.js',
   module: {
     rules:[
@@ -8,8 +15,12 @@ module.exports = {
         use: ['babel-loader']
       },
       {
-        test: /\.css$/i,
-        use: ['style-loader', 'css-loader'],
+        test: /\.(scss|css)$/i,
+        use: [
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+          'sass-loader'
+        ]
       },
     ]
   },

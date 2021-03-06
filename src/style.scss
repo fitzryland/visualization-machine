@@ -1,0 +1,75 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html,
+body {
+  background-color: black;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+.capture_video {
+  display: none;
+}
+.capture_canvas {
+  display: none;
+}
+
+
+.display_canvas {
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  background-size: 200%;
+}
+.display_canvas.left-right {
+  animation-name: left-right;
+  background-image: linear-gradient(
+    90deg,
+    rgba(0,255,218,0) 95%,
+    rgba(0,255,218,1) 98%,
+    rgba(0,255,218,1) 100%
+  );
+}
+@keyframes left-right {
+  0% {
+    background-position: -190% 0%;
+  }
+  100% {
+    background-position: -300% 0%;
+  }
+}
+.display_canvas.right-left {
+  animation-name: right-left;
+  background-image: linear-gradient(
+    90deg,
+    rgba(0,255,218,1) 0%,
+    rgba(0,255,218,1) 3px,
+    rgba(0,255,218,0) 20px
+  );
+}
+@keyframes right-left {
+  0% {
+    background-position: -300% 0%;
+  }
+  100% {
+    background-position: -190% 0%;
+  }
+}
+.display_canvas.top-bottom {
+  background-color: brown;
+}
+@keyframes top-bottom {
+  0% {
+    background-position: 0% -190%;
+  }
+  100% {
+    background-position: 0% -300%;
+  }
+}
+.display_canvas.bottom-top {
+  background-color: blue;
+}
