@@ -7,7 +7,7 @@ var fPixelArto = {
   displayCanvas: document.getElementById('js-display_canvas'),
   options: {
     motion: true,
-    audio: true,
+    audio: false,
     image: false
   },
   displayCtx: false,
@@ -25,7 +25,7 @@ var fPixelArto = {
   // captureHeight: 37,
   displayWidth: false,
   displayHeight: false,
-  scale: 1,
+  scale: 20,
   prevImg: false,
   pixels: [],
   pixelsAudio: [],
@@ -39,6 +39,7 @@ var fPixelArto = {
     'bottom-top'
   ],
   curClassI: 0,
+  directionEl: document.getElementById('js-direction'),
   isDifferent(a, b) {
     if ( Math.abs(a - b) > 50 ) {
       return true;
@@ -154,10 +155,45 @@ var fPixelArto = {
         that.displayCtx.fillRect(value.col * that.scale, value.row * that.scale, that.scale, that.scale)
       }
     }
+    that.captureDirection(now)
     if ( that.curColorI >= 360 ) {
       that.curColorI = 0
     } else {
       that.curColorI = that.curColorI + 10
+    }
+  },
+  getAvgPixel(pixels) {
+    var total = {
+      row: 0,
+      col: 0
+    }
+    var count = 0
+    pixels.forEach((pixel) => {
+      if ( typeof pixel.row !== 'undefined' ) {
+        total.row += pixel.row
+        total.col += pixel.col
+        count++
+      }
+    })
+    return {
+      row: total.row / count,
+      col: total.col / count
+    }
+  },
+  captureDirection(now) {
+    var that = this;
+    var youngPixels = Object.values(that.pixels).filter((pixel) => now - pixel.birth < 100)
+    var oldPixels = Object.values(that.pixels).filter((pixel) => now - pixel.birth > that.fadeDuration - 100)
+    if ( youngPixels.length > 3 && oldPixels.length > 3 ) {
+      var youngAvg = that.getAvgPixel(youngPixels)
+      var oldAvg = that.getAvgPixel(oldPixels)
+      var rowDiff = youngAvg.row - oldAvg.row;
+      var colDiff = youngAvg.col - oldAvg.col;
+      // This is kind of an odd angle, but I think we are on the right track!
+      // I think it is the oposite of what we want.
+      var angleDeg = Math.round(Math.atan2(rowDiff - 0, colDiff - 0) * 180 / Math.PI);
+      var transformVal = 'rotate(' + angleDeg + 'deg)'
+      that.directionEl.style.transform = transformVal
     }
   },
   renderAudio() {
