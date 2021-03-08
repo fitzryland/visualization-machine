@@ -189,8 +189,7 @@ var fPixelArto = {
       var oldAvg = that.getAvgPixel(oldPixels)
       var rowDiff = youngAvg.row - oldAvg.row;
       var colDiff = youngAvg.col - oldAvg.col;
-      // This is kind of an odd angle, but I think we are on the right track!
-      // I think it is the oposite of what we want.
+      // 0 degrees is pointing right
       var angleDeg = Math.round(Math.atan2(rowDiff - 0, colDiff - 0) * 180 / Math.PI);
       var transformVal = 'rotate(' + angleDeg + 'deg)'
       that.directionEl.style.transform = transformVal
@@ -237,7 +236,6 @@ var fPixelArto = {
   },
   captureVideo() {
     var that = this;
-    // capture video
     that.captureCtx.drawImage(that.camera, 0, 0, that.captureWidth, that.captureHeight)
     let imgData = that.captureCtx.getImageData(0, 0, that.captureWidth, that.captureHeight).data
     if ( fPixelArto.options.image ) {

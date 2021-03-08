@@ -34,12 +34,13 @@ body {
   100%{background-position:0% 50%}
 }
 .display_direction {
-  border-top: 40px solid hotpink;
-  border-right: 20px solid transparent;
-  border-bottom: none;
-  border-left: 20px solid transparent;
-  width: 40px;
+  border-top: 20px solid transparent;
+  border-right: none;
+  border-bottom: 20px solid transparent;
+  border-left: 80px solid hotpink;
   height: 40px;
+  transition: transform 0.2s ease;
+  width: 80px;
 }
 
 // .display_canvas {
