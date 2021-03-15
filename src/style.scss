@@ -20,6 +20,11 @@ body {
   display: none;
 }
 .display_canvas {
+  display: block;
+  height: auto;
+  margin-right: auto;
+  margin-left: auto;
+  max-width: 100%;
   // animation: BackgroundSlowChange 10s ease infinite;
   // background-image: linear-gradient(
   //   199deg,

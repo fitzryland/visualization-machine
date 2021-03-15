@@ -19,10 +19,10 @@ var fPixelArto = {
     audio: false,
     video: false
   },
-  captureWidth: 17,
-  captureHeight: 23,
-  // captureWidth: 50,
-  // captureHeight: 37,
+  // captureWidth: 17,
+  // captureHeight: 23,
+  captureWidth: 50,
+  captureHeight: 37,
   displayWidth: false,
   displayHeight: false,
   scale: 20,
@@ -155,7 +155,7 @@ var fPixelArto = {
         that.displayCtx.fillRect(value.col * that.scale, value.row * that.scale, that.scale, that.scale)
       }
     }
-    that.captureDirection(now)
+    // that.captureDirection(now)
     if ( that.curColorI >= 360 ) {
       that.curColorI = 0
     } else {
