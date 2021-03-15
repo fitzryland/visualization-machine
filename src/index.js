@@ -7,7 +7,7 @@ var fPixelArto = {
   displayCanvas: document.getElementById('js-display_canvas'),
   options: {
     motion: true,
-    audio: false,
+    audio: true,
     image: false
   },
   displayCtx: false,
